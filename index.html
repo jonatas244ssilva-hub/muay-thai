@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academia Tigres de Aço - Muay Thai</title>
+    <!-- Carrega o Tailwind CSS para estilização moderna e responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuração do Tema de Cores Roxo/Preto -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'mt-primary': '#4f1a7e', // Roxo Principal
+                        'mt-dark': '#1a1a1a', // Preto para Fundo e Texto
+                        'mt-accent': '#ffffff', // Branco Ocasional (destaque)
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Estilo para garantir que o fundo ocupe toda a tela */
+        
+        body {
+            background-color: #1a1a1a;
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+        /* Estilização para a seção de herói com fundo roxo */
+        
+        .hero-bg {
+            background-color: #4f1a7e;
+            background-image: url("https://placehold.co/1200x600/4f1a7e/ffffff?text=Foco+%7C+Disciplina+%7C+Força");
+            background-size: cover;
+            background-position: center;
+            /* Máscara de gradiente sutil para escurecer o fundo e aumentar o contraste com o texto */
+            position: relative;
+        }
+        
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(79, 26, 126, 0.7), rgba(26, 26, 26, 0.9));
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        /* Efeito de hover suave para botões */
+        
+        .btn-hover-effect {
+            transition: all 0.3s ease;
+            /* CORREÇÃO: Remove o contorno de foco padrão (o "pauzinho de escreve") */
+            outline: none;
+        }
+        
+        .btn-hover-effect:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(79, 26, 126, 0.6);
+        }
+        /* Estilo para links de navegação para feedback visual */
+        
+        .nav-link {
+            transition: color 0.2s;
+        }
+        
+        .nav-link:hover {
+            color: #ffffff;
+        }
+        
+        .whatsapp-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+        }
+    </style>
+    <!-- Ícone de Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body class="bg-mt-dark min-h-screen flex flex-col">
+
+    <!-- Container Principal do App SPA -->
+    <div id="app" class="flex-grow">
+
+        <!-- 1. TELA DE LOGIN/REGISTRO -->
+        <section id="login-view" class="flex items-center justify-center min-h-screen p-4" style="display: flex;">
+            <div id="auth-card" class="bg-mt-dark p-8 md:p-12 rounded-xl shadow-2xl w-full max-w-md border border-mt-primary/50 transform transition duration-500 hover:scale-[1.02] hover:shadow-mt-primary/50">
+                <div class="text-center mb-8">
+                    <i class="fas fa-fist-raised text-5xl text-mt-primary mb-3"></i>
+                    <h1 class="text-3xl font-bold text-white tracking-widest uppercase">Academia Tigres de Aço</h1>
+                    <!-- O título será atualizado via JavaScript para Login ou Novo Registro -->
+                    <p class="text-mt-accent/70 mt-2"><span id="auth-title-text">Login de Aluno</span></p>
+                </div>
+
+                <!-- Formulário de Login (Inicialmente visível) -->
+                <form id="login-form">
+                    <div class="mb-4">
+                        <label for="username" class="block text-sm font-medium text-mt-accent/80 mb-1">E-mail (Usuário)</label>
+                        <input type="text" id="username" value="aluno@mt.com" placeholder="Seu nome de usuário ou e-mail" required class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-mt-primary focus:border-mt-primary transition duration-200">
+                    </div>
+                    <div class="mb-6">
+                        <label for="password" class="block text-sm font-medium text-mt-accent/80 mb-1">Senha</label>
+                        <input type="password" id="password" value="123456" placeholder="Sua senha secreta" required class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-mt-primary focus:border-mt-primary transition duration-200">
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-mt-primary text-white font-semibold rounded-lg uppercase tracking-wider btn-hover-effect">
+                        Entrar e Treinar
+                    </button>
+                    <p id="login-error" class="text-red-400 text-sm text-center mt-3 hidden">Erro de login. Tente novamente.</p>
+                    <p class="text-center text-xs text-gray-500 mt-6">Credenciais simuladas: aluno@mt.com / 123456</p>
+                    <!-- Adiciona link para Registro -->
+                    <p class="text-center text-xs text-gray-500 mt-4">Não tem conta? <button type="button" onclick="showRegisterForm()" class="text-mt-primary hover:text-white font-semibold underline">Crie uma aqui.</button></p>
+                </form>
+
+                <!-- Formulário de Registro (Inicialmente oculto) -->
+                <form id="register-form" class="hidden">
+                    <div class="mb-4">
+                        <label for="reg-name" class="block text-sm font-medium text-mt-accent/80 mb-1">Nome Completo</label>
+                        <input type="text" id="reg-name" placeholder="Seu nome completo" required class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-mt-primary focus:border-mt-primary transition duration-200">
+                    </div>
+                    <div class="mb-4">
+                        <label for="reg-email" class="block text-sm font-medium text-mt-accent/80 mb-1">E-mail (Será seu Usuário)</label>
+                        <input type="email" id="reg-email" placeholder="seu.email@exemplo.com" required class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-mt-primary focus:border-mt-primary transition duration-200">
+                    </div>
+                    <div class="mb-6">
+                        <label for="reg-password" class="block text-sm font-medium text-mt-accent/80 mb-1">Crie uma Senha (Mín. 6 caracteres)</label>
+                        <input type="password" id="reg-password" placeholder="Nova senha" required minlength="6" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-mt-primary focus:border-mt-primary transition duration-200">
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-green-600 text-white font-semibold rounded-lg uppercase tracking-wider btn-hover-effect">
+                        Registrar e Começar
+                    </button>
+                    <p id="register-error" class="text-red-400 text-sm text-center mt-3 hidden">Erro de registro. Verifique os dados.</p>
+                    <p class="text-center text-xs text-gray-500 mt-6">Já tem conta? <button type="button" onclick="showLoginForm()" class="text-mt-primary hover:text-white font-semibold underline">Fazer Login.</button></p>
+                </form>
+
+            </div>
+        </section>
+
+        <!-- 2. TELA PRINCIPAL (HOME) e PERFIL -->
+        <section id="main-content-view" class="hidden min-h-screen flex flex-col">
+
+            <!-- Navbar de Navegação -->
+            <nav class="bg-mt-dark shadow-xl sticky top-0 z-40 border-b border-mt-primary/50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between items-center h-16">
+                        <div class="flex items-center">
+                            <i class="fas fa-dragon text-2xl text-mt-primary mr-2"></i>
+                            <span class="text-xl font-extrabold text-white">Tigres de Aço</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <a href="#" class="nav-link text-gray-400 hover:text-white transition duration-150" onclick="showView('home-section')">Início</a>
+                            <a href="#" class="nav-link text-gray-400 hover:text-white transition duration-150" onclick="showView('profile-section')">Meu Perfil</a>
+                            <button class="text-sm px-3 py-1 bg-gray-700 hover:bg-red-700 rounded-lg transition duration-200" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i> Sair
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- CONTEÚDO PRINCIPAL (HOME) -->
+            <main id="home-section" class="flex-grow p-4 md:p-8 lg:p-12" style="display: block;">
+
+                <!-- Hero Section com Boas-Vindas -->
+                <div class="hero-bg mb-12 rounded-2xl shadow-xl p-8 md:p-16 text-white overflow-hidden">
+                    <div class="hero-content">
+                        <h1 id="welcome-message" class="text-4xl md:text-6xl font-black mb-4 uppercase tracking-wider">
+                            Bem-vindo, Lutador!
+                        </h1>
+                        <p class="text-lg md:text-xl font-light max-w-2xl">
+                            Mantenha o foco. A jornada do Muay Thai é de autodescoberta, disciplina e poder. Sua próxima aula começa em breve.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 3. INFORMAÇÕES SOBRE O MUAY THAI -->
+                <h2 class="text-3xl font-bold text-mt-primary mb-6 border-b-2 border-mt-primary pb-2">O Caminho do 8 Membros</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+
+                    <!-- História -->
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-lg border-t-4 border-mt-primary">
+                        <i class="fas fa-scroll text-3xl text-mt-primary mb-3"></i>
+                        <h3 class="text-xl font-semibold mb-2">História do Muay Thai</h3>
+                        <p class="text-gray-300 text-sm">Arte marcial tailandesa milenar, conhecida como a "arte das oito armas" (punhos, cotovelos, joelhos e canelas). Desenvolvida para a guerra e aperfeiçoada para o esporte, é um símbolo de honra e resiliência da Tailândia.</p>
+                    </div>
+
+                    <!-- Benefícios -->
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-lg border-t-4 border-mt-primary">
+                        <i class="fas fa-heartbeat text-3xl text-mt-primary mb-3"></i>
+                        <h3 class="text-xl font-semibold mb-2">Benefícios Físicos</h3>
+                        <p class="text-gray-300 text-sm">Alto gasto calórico, aumento da capacidade cardiovascular, tonificação muscular de corpo inteiro e melhora significativa na coordenação motora e flexibilidade. É um treino completo e intenso.</p>
+                    </div>
+
+                    <!-- Recomendado -->
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-lg border-t-4 border-mt-primary">
+                        <i class="fas fa-users text-3xl text-mt-primary mb-3"></i>
+                        <h3 class="text-xl font-semibold mb-2">Para Quem é</h3>
+                        <p class="text-gray-300 text-sm">Recomendado para todas as idades e níveis de condicionamento. É ideal para quem busca defesa pessoal, condicionamento físico extremo ou apenas uma atividade que exija foco e libere o estresse.</p>
+                    </div>
+
+                    <!-- Filosofia -->
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-lg border-t-4 border-mt-primary">
+                        <i class="fas fa-hand-holding-heart text-3xl text-mt-primary mb-3"></i>
+                        <h3 class="text-xl font-semibold mb-2">Filosofia</h3>
+                        <p class="text-gray-300 text-sm">Além da luta, o Muay Thai ensina humildade, respeito ao Mestre (Kru) e aos colegas, disciplina rigorosa e controle emocional. O treino é uma metáfora para superar desafios na vida.</p>
+                    </div>
+
+                </div>
+
+                <!-- 4. INFORMAÇÕES DA ACADEMIA -->
+                <div class="bg-gray-900 p-8 rounded-xl shadow-2xl mb-12 border border-mt-primary/30">
+                    <h2 class="text-3xl font-bold text-mt-accent mb-4">Seu Próximo Treino</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-lg">
+
+                        <div class="flex items-center p-3 bg-mt-dark rounded-lg">
+                            <i class="fas fa-calendar-alt text-mt-primary mr-3"></i>
+                            <div>
+                                <p class="text-gray-400 text-sm">Dias de Treino</p>
+                                <p class="font-semibold text-white">Segundas, Quartas e Sextas</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center p-3 bg-mt-dark rounded-lg">
+                            <i class="fas fa-clock text-mt-primary mr-3"></i>
+                            <div>
+                                <p class="text-gray-400 text-sm">Horário (Foco Principal)</p>
+                                <p class="font-semibold text-white">19:30 até 21:00</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center p-3 bg-mt-dark rounded-lg">
+                            <i class="fas fa-map-marker-alt text-mt-primary mr-3"></i>
+                            <div>
+                                <p class="text-gray-400 text-sm">Localização (Matriz)</p>
+                                <p class="font-semibold text-white">Igreja Principal de Santo Antônio do Descoberto - GO</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- CONTEÚDO DE PERFIL -->
+            <section id="profile-section" class="flex-grow p-4 md:p-8 lg:p-12 hidden">
+                <div class="max-w-4xl mx-auto bg-gray-900 p-6 md:p-10 rounded-xl shadow-2xl border-t-8 border-mt-primary">
+                    <h2 class="text-3xl font-bold text-mt-accent mb-8 border-b border-gray-700 pb-2 flex items-center">
+                        <i class="fas fa-user-circle text-mt-primary mr-3"></i> Meu Perfil de Lutador
+                    </h2>
+
+                    <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
+                        <!-- Foto e Informações de Perfil -->
+                        <div class="flex-shrink-0">
+                            <img id="profile-photo" src="https://placehold.co/150x150/4f1a7e/ffffff?text=Lutador" alt="Foto do Perfil" class="w-36 h-36 rounded-full object-cover border-4 border-mt-primary shadow-lg">
+                        </div>
+
+                        <div class="flex-grow w-full">
+                            <h3 id="profile-name-display" class="text-4xl font-extrabold text-mt-accent mb-1">Nome do Lutador</h3>
+                            <p id="profile-age-display" class="text-xl text-mt-primary mb-4">25 anos</p>
+
+                            <!-- Dados Básicos -->
+                            <div class="space-y-3">
+                                <p class="text-gray-300 flex items-center"><i class="fas fa-envelope mr-3 text-mt-primary"></i> <span id="profile-email-display">email@exemplo.com</span></p>
+                                <p class="text-gray-300 flex items-center"><i class="fas fa-shoe-prints mr-3 text-mt-primary"></i> Nível: <span id="profile-level-display" class="font-semibold text-white ml-1">Intermediário</span></p>
+                                <p class="text-gray-300 flex items-center"><i class="fas fa-dumbbell mr-3 text-mt-primary"></i> Peso: <span id="profile-weight-display" class="font-semibold text-white ml-1">75 kg</span></p>
+                            </div>
+
+                            <button onclick="toggleEditMode()" id="edit-button" class="mt-6 px-6 py-2 bg-mt-primary text-white rounded-lg font-semibold uppercase text-sm btn-hover-effect">
+                                <i class="fas fa-edit mr-2"></i> Editar Dados
+                            </button>
+                            <button onclick="saveProfile()" id="save-button" class="mt-6 px-6 py-2 bg-green-600 text-white rounded-lg font-semibold uppercase text-sm btn-hover-effect hidden">
+                                <i class="fas fa-save mr-2"></i> Salvar Perfil
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Formulário de Edição (Inicialmente Oculto) -->
+                    <div id="edit-form-container" class="mt-8 pt-6 border-t border-gray-700 hidden">
+                        <h4 class="text-xl font-semibold text-mt-primary mb-4">Edição Rápida</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400">Nome Completo</label>
+                                <input type="text" id="edit-name" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400">Idade</label>
+                                <input type="number" id="edit-age" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400">Peso (kg)</label>
+                                <input type="number" id="edit-weight" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400">Nível</label>
+                                <select id="edit-level" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white">
+                                    <option>Iniciante</option>
+                                    <option>Intermediário</option>
+                                    <option>Avançado</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Rodapé e Botão Fixo de Contato -->
+            <footer class="bg-mt-dark border-t border-gray-800 p-4 text-center text-gray-500 text-sm">
+                &copy; 2025 Academia Tigres de Aço. Todos os direitos reservados. Treine Duro.
+            </footer>
+        </section>
+
+        <!-- 6. Contato do Mestre - Botão Fixo de WhatsApp -->
+        <a id="whatsapp-button" href="https://wa.me/556193249320" target="_blank" class="whatsapp-fixed bg-green-500 p-4 rounded-full shadow-lg hover:bg-green-600 transition duration-300 btn-hover-effect" title="Fale com o Mestre via WhatsApp">
+            <i class="fab fa-whatsapp text-2xl text-white"></i>
+        </a>
+
+        <!-- Mensagem de Confirmação (Substitui alert()) -->
+        <div id="message-box" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-mt-primary max-w-sm w-full">
+                <h3 id="message-title" class="text-xl font-bold text-mt-primary mb-3">Mensagem</h3>
+                <p id="message-text" class="text-gray-300 mb-4"></p>
+                <button onclick="hideMessage()" class="w-full py-2 bg-mt-primary text-white rounded-lg font-semibold">OK</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Variáveis globais para simular o estado do usuário
+        let currentUser = {
+            name: "João 'Martelo' Silva",
+            age: 25,
+            email: "joao.silva@mt.com.br",
+            level: "Intermediário",
+            weight: 75,
+            isAuthenticated: false
+        };
+
+        // Número de WhatsApp do Mestre (exemplo)
+        const masterWhatsapp = "556193249320"; // Exemplo: +55 (61) 98765-4321
+
+        /**
+         * Exibe a caixa de mensagem personalizada (substitui alert()).
+         * @param {string} title Título da mensagem.
+         * @param {string} text Conteúdo da mensagem.
+         */
+        function showMessage(title, text) {
+            document.getElementById('message-title').textContent = title;
+            document.getElementById('message-text').textContent = text;
+            document.getElementById('message-box').classList.remove('hidden');
+        }
+
+        /** Oculta a caixa de mensagem. */
+        function hideMessage() {
+            document.getElementById('message-box').classList.add('hidden');
+        }
+
+        /**
+         * Alterna a visualização principal do SPA.
+         * @param {string} viewId ID da seção (ex: 'home-section' ou 'profile-section').
+         */
+        function showView(viewId) {
+            // Oculta todas as seções de conteúdo principal
+            document.getElementById('home-section').style.display = 'none';
+            document.getElementById('profile-section').style.display = 'none';
+
+            // Exibe a seção solicitada
+            document.getElementById(viewId).style.display = 'block';
+
+            // Se for a seção de perfil, atualiza os dados antes de mostrar
+            if (viewId === 'profile-section') {
+                updateProfileDisplay();
+                // Garante que o modo de edição esteja oculto ao entrar
+                document.getElementById('edit-form-container').classList.add('hidden');
+                document.getElementById('save-button').classList.add('hidden');
+                document.getElementById('edit-button').classList.remove('hidden');
+            }
+        }
+
+        /**
+         * Atualiza os elementos visuais do perfil com os dados do currentUser.
+         */
+        function updateProfileDisplay() {
+            const firstName = currentUser.name.split(' ')[0];
+            document.getElementById('welcome-message').textContent = `Bem-vindo, ${firstName}!`;
+
+            document.getElementById('profile-name-display').textContent = currentUser.name;
+            document.getElementById('profile-age-display').textContent = `${currentUser.age} anos`;
+            document.getElementById('profile-email-display').textContent = currentUser.email;
+            document.getElementById('profile-level-display').textContent = currentUser.level;
+            document.getElementById('profile-weight-display').textContent = `${currentUser.weight} kg`;
+
+            // Preenche o formulário de edição
+            document.getElementById('edit-name').value = currentUser.name;
+            document.getElementById('edit-age').value = currentUser.age;
+            document.getElementById('edit-weight').value = currentUser.weight;
+            document.getElementById('edit-level').value = currentUser.level;
+
+            // Define a URL do WhatsApp
+            document.getElementById('whatsapp-button').href = `https://wa.me/${masterWhatsapp}`;
+        }
+
+        /**
+         * Alterna entre o modo de visualização e edição do perfil.
+         */
+        function toggleEditMode() {
+            const editForm = document.getElementById('edit-form-container');
+            const editButton = document.getElementById('edit-button');
+            const saveButton = document.getElementById('save-button');
+
+            const isHidden = editForm.classList.toggle('hidden');
+
+            if (isHidden) {
+                editButton.classList.remove('hidden');
+                saveButton.classList.add('hidden');
+            } else {
+                editButton.classList.add('hidden');
+                saveButton.classList.remove('hidden');
+            }
+        }
+
+        /**
+         * Salva os dados do formulário de edição (simulado).
+         */
+        function saveProfile() {
+            const name = document.getElementById('edit-name').value;
+            const age = parseInt(document.getElementById('edit-age').value);
+            const weight = parseFloat(document.getElementById('edit-weight').value);
+            const level = document.getElementById('edit-level').value;
+
+            // Validação simples
+            if (!name || isNaN(age) || isNaN(weight) || age <= 0 || weight <= 0) {
+                showMessage("Erro de Validação", "Por favor, preencha todos os campos com valores válidos.");
+                return;
+            }
+
+            // Atualiza o objeto currentUser
+            currentUser.name = name;
+            currentUser.age = age;
+            currentUser.weight = weight;
+            currentUser.level = level;
+
+            // Atualiza a visualização do perfil
+            updateProfileDisplay();
+
+            // Oculta o formulário de edição
+            toggleEditMode();
+
+            showMessage("Sucesso!", "Seu perfil foi atualizado com sucesso (Simulação).");
+        }
+
+        /**
+         * Alterna para exibir o formulário de login.
+         */
+        function showLoginForm() {
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('auth-title-text').textContent = 'Login de Aluno';
+            document.getElementById('login-error').classList.add('hidden');
+            document.getElementById('register-error').classList.add('hidden'); // Limpar erro de registro
+        }
+
+        /**
+         * Alterna para exibir o formulário de registro.
+         */
+        function showRegisterForm() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
+            document.getElementById('auth-title-text').textContent = 'Novo Registro';
+            document.getElementById('login-error').classList.add('hidden'); // Limpar erro de login
+            document.getElementById('register-error').classList.add('hidden');
+            document.getElementById('register-form').reset(); // Limpa o formulário ao alternar
+        }
+
+        /**
+         * Simula o processo de registro de um novo usuário.
+         * @param {Event} e Evento de submit do formulário.
+         */
+        function handleRegister(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            const errorElement = document.getElementById('register-error');
+
+            if (!name || !email || password.length < 6) {
+                errorElement.textContent = 'Por favor, preencha nome, um e-mail válido e uma senha com no mínimo 6 caracteres.';
+                errorElement.classList.remove('hidden');
+                return;
+            }
+
+            // Simulação de registro bem-sucedido: define o novo usuário como o currentUser
+            currentUser.name = name;
+            currentUser.email = email;
+            currentUser.age = 18; // Valor padrão para novo usuário
+            currentUser.weight = 70; // Valor padrão para novo usuário
+            currentUser.level = 'Iniciante'; // Nível padrão
+            currentUser.isAuthenticated = true;
+
+            errorElement.classList.add('hidden');
+            showMessage("Registro Concluído!", `Parabéns, ${name}! Seu registro foi simulado com sucesso. Bem-vindo(a) aos Tigres de Aço!`);
+
+            // Transição para a tela principal
+            document.getElementById('login-view').style.display = 'none';
+            document.getElementById('main-content-view').style.display = 'flex';
+
+            updateProfileDisplay();
+            showView('home-section');
+
+            // Limpa o formulário após o registro
+            document.getElementById('register-form').reset();
+        }
+
+
+        /**
+         * Simula o processo de login.
+         * @param {Event} e Evento de submit do formulário.
+         */
+        function handleLogin(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorElement = document.getElementById('login-error');
+
+            // Simulação de credenciais
+            if (username === 'aluno@mt.com' && password === '123456') {
+                currentUser.isAuthenticated = true;
+                errorElement.classList.add('hidden');
+
+                // Transição de telas
+                document.getElementById('login-view').style.display = 'none';
+                document.getElementById('main-content-view').style.display = 'flex';
+
+                updateProfileDisplay();
+                showView('home-section');
+            } else {
+                errorElement.textContent = 'Credenciais inválidas. Tente novamente.';
+                errorElement.classList.remove('hidden');
+            }
+        }
+
+        /** Simula o processo de logout. */
+        function logout() {
+            currentUser.isAuthenticated = false;
+
+            document.getElementById('main-content-view').style.display = 'none';
+            document.getElementById('login-view').style.display = 'flex';
+
+            // Limpa campos e esconde erros de login
+            document.getElementById('login-form').reset();
+            document.getElementById('login-error').classList.add('hidden');
+
+            showMessage("Logout", "Você saiu da sua conta. Até o próximo treino!");
+        }
+
+        // Adiciona os listeners de evento aos formulários
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('login-form').addEventListener('submit', handleLogin);
+            document.getElementById('register-form').addEventListener('submit', handleRegister);
+        });
+    </script>
+</body>
+
+</html>
